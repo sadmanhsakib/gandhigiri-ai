@@ -1,9 +1,9 @@
 import os, time
 from dotenv import load_dotenv
 from pyannote.audio import Pipeline
-from pydub import AudioSegment
 from pyannote.audio.pipelines.utils.hook import ProgressHook
 from pyannote.database.util import load_rttm
+from pydub import AudioSegment
 
 load_dotenv()
 
@@ -46,8 +46,7 @@ def get_prefered_audio_clips(diarization, speaker: str):
     clips = []
 
     for segment, _, spk in diarization.itertracks(yield_label=True):
-        duration = segment.end - segment.start
-        if spk == speaker and duration > 2.0:
+        if spk == speaker:
             clip = audio[int(segment.start * 1000):int(segment.end * 1000)]
             clips.append(clip)
 
