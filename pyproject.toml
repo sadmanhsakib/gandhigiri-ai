@@ -3,8 +3,9 @@ name = "gandhigiri-ai"
 version = "0.1.0"
 description = ""
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.10"
 dependencies = [
     "dotenv>=0.9.9",
-    "groq>=1.4.0",
+    "pyannote-audio>=4.0.4",
+    "pydub>=0.25.1",
 ]
