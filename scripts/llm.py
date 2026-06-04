@@ -10,6 +10,8 @@ API_KEY = os.getenv("API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
 IN_HINDI = False if int(os.getenv("IN_HINDI")) == 0 else 1
 
+CONVERSATION_HISTROY_FILEPATH = "conversation-history.json"
+
 client = Groq(api_key=API_KEY)
 
 
@@ -75,54 +77,53 @@ def get_system_prompt():
 
 def main():
     GANDHI_SYSTEM_PROMPT = get_system_prompt()
+    
+    data = []
     conversation_history = []
     
-    if not os.path.exists("conversation-history.json"):
-        print("No conversation-history.json found. Starting a new conversation...")
-        with open("conversation-history.json", 'w') as file:
-            conversations = [
+    if not os.path.exists(CONVERSATION_HISTROY_FILEPATH):
+        print(f"No {CONVERSATION_HISTROY_FILEPATH} found. Starting a new conversation...")
+        with open(CONVERSATION_HISTROY_FILEPATH, 'w') as file:
+            data = [
                 {
                     "conversation-number": 1,
                     "model_used": MODEL_NAME,
                     "creation_date": datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
-                    "history": {
+                    "history": [{
                         "role": "system",
                         "content": GANDHI_SYSTEM_PROMPT,
-                    },
+                    }],
                 }
             ]
+            conversation_history = [data[0]["history"]]
+            json.dump(data, file, indent=3)
 
-            json.dump(conversations, file, indent=3)
-            conversation_number = 1
-            data = conversations
-            conversation_history = [conversations[0]["history"]]
     else:
-        with open("conversation-history.json", 'r') as file:
-            data = json.load(file)
+        with open(CONVERSATION_HISTROY_FILEPATH, 'r') as file:
+            data = json.load(file) 
         conversation_number = int(input("Enter Conversation Number(0 to create a new one): "))
-
+                
         if conversation_number == 0:
-            conversations = [
-                [
-                    data,
-                    {
-                        "conversation-number": data[-1]["conversation-number"] + 1,
-                        "model_used": MODEL_NAME,
-                        "creation_date": datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
-                        "history": {
-                            "role": "system",
-                            "content": GANDHI_SYSTEM_PROMPT,
-                        },
-                    },
-                ]
-            ]
+            conversation = {
+                "conversation-number": data[-1]["conversation-number"] + 1,
+                "model_used": MODEL_NAME,
+                "creation_date": datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
+                "history": [{
+                    "role": "system",
+                    "content": GANDHI_SYSTEM_PROMPT,
+                }],
+            }
+            data.append(conversation)
+            
+            with open(CONVERSATION_HISTROY_FILEPATH, 'w') as file:
+                json.dump(data, file, indent=3)
         else:
             for conversation in data:
                 if conversation["conversation-number"] == conversation_number:
                     conversation_history = conversation["history"]
 
     while True:
-        prompt = input("Prompt: ")
+        prompt = input("Prompt (/quit to quit): ")
         
         if prompt.lower() == '/quit':
             for i, conversation in enumerate(data, 0):
@@ -134,7 +135,7 @@ def main():
             print(f"\nResponse: {output}") 
         
     
-    with open("conversation-history.json", 'w') as file:
+    with open(CONVERSATION_HISTROY_FILEPATH, 'w') as file:
         json.dump(data, file, indent=3)
 
 
@@ -142,7 +143,7 @@ def generate_output(prompt: str, conversation_history: list[dict]):
     conversation_history.append(
         {
             "role": "user",
-            "content": f"{prompt}\n\n(Respond in Romanized Hindi only)",
+            "content": prompt,
         }
     )
 
