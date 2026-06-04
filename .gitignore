@@ -7,10 +7,6 @@ __pycache__/
 *.so
 
 # project
-MeloTTS/
-OpenVoice/
-
-checkpoints_v2/
 outputs/
 tmp/
 reference_audio/
