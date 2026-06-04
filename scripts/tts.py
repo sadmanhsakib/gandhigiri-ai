@@ -40,7 +40,7 @@ print("[TTS] Ready.")
 
 def main():
     test_text = (
-        "Jis rahh pe tum chal rahe ho beta ekdin buri tarah fasoge."
+        "The quick brown fox jumps over the lazy dog. "
     )
     print(f"[TEST] Synthesizing: {test_text}")
     path = synthesize(test_text)
