@@ -1,4 +1,4 @@
-import json, os, time
+import json, os
 from datetime import datetime
 from dotenv import load_dotenv
 from groq import Groq
@@ -166,6 +166,4 @@ def generate_output(prompt: str, conversation_history: list[dict]):
 
 
 if __name__ == "__main__":
-    start_time = time.time()
     main()
-    print(f"\n✅ Execution completed in {time.time() - start_time:.2f} seconds")
