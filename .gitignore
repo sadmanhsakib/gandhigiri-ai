@@ -7,7 +7,7 @@ __pycache__/
 *.so
 
 # project
-outputs/
+output/
 tmp/
 reference_audio/
 *.json
