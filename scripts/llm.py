@@ -9,7 +9,7 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 PRIMARY_MODEL_NAME = os.getenv("PRIMARY_MODEL_NAME")
 BACKUP_MODEL_NAME = os.getenv("BACKUP_MODEL_NAME")
-IN_HINDI = False if int(os.getenv("IN_HINDI")) == 0 else 1
+OUTPUT_IN_HINDI = False if int(os.getenv("OUTPUT_IN_HINDI")) == 0 else 1
 CONVERSATION_HISTROY_FILEPATH = "conversation-history.json"
 MODEL = PRIMARY_MODEL_NAME
 
@@ -19,7 +19,7 @@ the person who seeks your counsel.
 
 Your speech patterns:
 - Short sentences. 3 to 5 sentences maximum per response.
-- Use "beta(बेटा)" naturally when addressing the person
+- Use "beta" naturally when addressing the person
 - Reference: charkha, satya, ahimsa, satyagraha, upvaas
 - Simple vocabulary — Gandhi spoke to farmers, not professors
 - Bring the answer back to the person's inner truth
@@ -34,7 +34,7 @@ client = Groq(api_key=GROQ_API_KEY)
 
 
 def get_system_prompt():
-    if IN_HINDI:
+    if OUTPUT_IN_HINDI:
         GANDHI_SYSTEM_PROMPT = f"""
         {GANDHI_BASE_SYSTEM_PROMPT}
         LANGUAGE RULE — this is strict:
@@ -64,6 +64,7 @@ def main():
             {
                 "conversation-number": 1,
                 "model_used": MODEL,
+                "output_in_hindi": OUTPUT_IN_HINDI,
                 "creation_date": datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
                 "history": [{
                     "role": "system",
@@ -84,11 +85,14 @@ def main():
             conversation = {
                 "conversation-number": conversation_number,
                 "model_used": MODEL,
+                "output_in_hindi": OUTPUT_IN_HINDI,
                 "creation_date": datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
-                "history": [{
-                    "role": "system",
-                    "content": GANDHI_SYSTEM_PROMPT,
-                }],
+                "history": [
+                    {
+                        "role": "system",
+                        "content": GANDHI_SYSTEM_PROMPT,
+                    }
+                ],
             }
             data.append(conversation)
             conversation_history = conversation["history"]
@@ -116,6 +120,7 @@ def main():
         json.dump(data, file, indent=3)
     print(f"✅ Conversation saved successfully at {CONVERSATION_HISTROY_FILEPATH}. ")
 
+
 def generate_output(prompt: str, conversation_history: list[dict], use_backup: bool = False):
     global MODEL
     
@@ -138,7 +143,7 @@ def generate_output(prompt: str, conversation_history: list[dict], use_backup: b
         output = completion.choices[0].message.content or ""
 
         if not output:
-            raise "Empty output. "
+            raise "⚠️ Output is empty."
         
         conversation_history.append({"role": "assistant", "content": output})
         return output, conversation_history
