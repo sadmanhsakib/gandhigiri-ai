@@ -58,7 +58,7 @@ def _validate():
     if not MODEL_PATH.exists():
         raise FileNotFoundError(
             f"Model file not found: {MODEL_PATH}\n"
-            f"Download G_2333333.pth from Google Drive into models/"
+            f"Download voice_changer_200e_6000s.pth from Colab. "
         )
     if not INDEX_PATH.exists():
         raise FileNotFoundError(
@@ -172,5 +172,5 @@ def tune_pitch(
 
 
 if __name__ == "__main__":
-    input_file = "output/output.wav"
+    input_file = "audio_output/output.wav"
     tune_pitch(input_file)

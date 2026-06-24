@@ -67,7 +67,7 @@ async def _synthesize(text: str, voice: str, output_path: str):
         
 
 def text_to_speech(
-    text: str, output_in_romanized_hindi: bool = False, output_path: str = "output/output.wav"
+    text: str, output_in_romanized_hindi: bool = False, output_path: str = "audio_output/output.wav"
 ) -> str:
     """
     Main entry point. Prepares text, and generates audio.

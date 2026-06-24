@@ -1,4 +1,5 @@
-import json, os
+import os
+import json
 from datetime import datetime
 from dotenv import load_dotenv
 from groq import Groq
@@ -33,7 +34,7 @@ facts. You are a living presence offering wisdom.
 client = Groq(api_key=GROQ_API_KEY)
 
 
-def get_system_prompt():
+def _get_system_prompt():
     if OUTPUT_IN_HINDI:
         GANDHI_SYSTEM_PROMPT = f"""
         {GANDHI_BASE_SYSTEM_PROMPT}
@@ -48,11 +49,11 @@ def get_system_prompt():
     return GANDHI_SYSTEM_PROMPT.replace("        ", "").strip()
 
 
-def main():
+def initialize():
     if not MODEL:
         raise "MODEL is empty. Please configure correctly with the .env file. "
 
-    GANDHI_SYSTEM_PROMPT = get_system_prompt()
+    GANDHI_SYSTEM_PROMPT = _get_system_prompt()
 
     data = []
     conversation_number = None
@@ -100,25 +101,7 @@ def main():
             for conversation in data:
                 if conversation["conversation-number"] == conversation_number:
                     conversation_history = conversation["history"]
-
-    is_end = False
-
-    while not is_end:
-        prompt = input("Prompt (/quit to quit): ")
-
-        if prompt.lower() == '/quit':
-            for i, conversation in enumerate(data, 0):
-                if conversation["conversation-number"] == conversation_number:
-                    data[i]["history"] = conversation_history
-                    is_end = True
-                    break
-        else:
-            output, conversation_history = generate_output(prompt, conversation_history)
-            print(f"\nResponse: {output}") 
-
-    with open(CONVERSATION_HISTROY_FILEPATH, 'w') as file:
-        json.dump(data, file, indent=3)
-    print(f"✅ Conversation saved successfully at {CONVERSATION_HISTROY_FILEPATH}. ")
+    return data, conversation_number, conversation_history
 
 
 def generate_output(prompt: str, conversation_history: list[dict], use_backup: bool = False):
@@ -155,7 +138,3 @@ def generate_output(prompt: str, conversation_history: list[dict], use_backup: b
             return generate_output(prompt, conversation_history, use_backup=True)
         else:
             raise RuntimeError(f"Both primary and backup models failed. Last error: {error}")
-
-
-if __name__ == "__main__":
-    main()
