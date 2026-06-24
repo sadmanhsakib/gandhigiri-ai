@@ -97,8 +97,6 @@ def _run_inference(
         "--export_format",   "WAV",
     ]
 
-    print(f"[voice_changer] Converting: {input_audio_path.name} -> {output_filename}")
-
     result = subprocess.run(
         cmd,
         cwd=str(APPLIO_DIR),  # critical: core.py needs to run from its own directory
@@ -118,8 +116,6 @@ def _run_inference(
             f"Inference completed but output file not found: {output_path}\n"
             f"Applio stdout: {result.stdout}"
         )
-
-    print(f"[voice_changer] Done. Gandhi audio saved to: {output_path}")
     return output_path
 
 
@@ -173,4 +169,5 @@ def tune_pitch(
 
 if __name__ == "__main__":
     input_file = "audio_output/output.wav"
-    tune_pitch(input_file)
+    x = convert_to_gandhi_voice(input_file)
+    print(x)
