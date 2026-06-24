@@ -28,7 +28,7 @@ def main():
                     is_end = True
                     break
         else:
-            if prompt == "":
+            if prompt == "" and actual_audio_path != "":
                 playsound(actual_audio_path)
                 continue
             output, conversation_history = llm.generate_output(prompt, conversation_history)

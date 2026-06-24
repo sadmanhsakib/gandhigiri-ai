@@ -21,8 +21,7 @@ from indic_transliteration.sanscript import transliterate
 # ---------------------------------------------------------------------------
 # Pick voices that sound calm/measured -- closer to Gandhi's cadence,
 # which helps RVC produce a more natural final result.
-ENGLISH_VOICE = "en-IN-PrabhatNeural"  # Indian-English male voice
-HINDI_VOICE = "hi-IN-MadhurNeural"  # Hindi male voice
+VOICE = "en-IN-PrabhatNeural"  # Indian-English male voice
 
 # Rate/pitch tweaks: Gandhi's speech is slow and deliberate.
 # edge-tts supports SSML-like prosody via these params.
@@ -32,12 +31,11 @@ SPEECH_PITCH = "-5Hz"
 
 def main():
     samples = [
-        ("The path you are walking on, son, will one day get you into trouble.", False),
-        ("जिस राह पे तुम चल रहे हो बेटा एक दिन बुरी तरह फसोगे।", True),
+        "The path you are walking on, son, will one day get you in trouble.",
+        "Beta, sach bolo aur sir uthake jio. Tumne bachan diya tha, mera ek kaam karoge.",
     ]
-    
-    sample = samples[1]
-    output_path = text_to_speech(text=sample[0], output_in_romanized_hindi=sample[1])
+
+    output_path = text_to_speech(text=samples[1])
     print(f"✅ File exported successfully to {output_path}")
 
 def romanized_to_devanagari(text: str) -> str:
@@ -67,14 +65,13 @@ async def _synthesize(text: str, voice: str, output_path: str):
         
 
 def text_to_speech(
-    text: str, output_in_romanized_hindi: bool = False, output_path: str = "audio_output/output.wav"
+    text: str, output_path: str = "audio_output/output.wav"
 ) -> str:
     """
     Main entry point. Prepares text, and generates audio.
 
     Args:
         text: LLM output, either English or romanized Hindi.
-        output_in_romanized_hindi: LLM output language.
         output_path: where to save the generated audio file.
 
     Returns:
@@ -82,14 +79,8 @@ def text_to_speech(
     """
     if not text or not text.strip():
         raise ValueError("text_to_speech received empty text")
-    if output_in_romanized_hindi:
-        voice = HINDI_VOICE
-        final_text = romanized_to_devanagari(text)
-    else:
-        voice = ENGLISH_VOICE
-        final_text = text
     
-    asyncio.run(_synthesize(final_text, voice, output_path))
+    asyncio.run(_synthesize(text, VOICE, output_path))
     return output_path
 
 

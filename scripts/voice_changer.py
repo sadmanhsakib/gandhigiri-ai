@@ -169,5 +169,4 @@ def tune_pitch(
 
 if __name__ == "__main__":
     input_file = "audio_output/output.wav"
-    x = convert_to_gandhi_voice(input_file)
-    print(x)
+    tune_pitch(input_file)
