@@ -7,9 +7,11 @@ __pycache__/
 *.so
 
 # project
-output/
+Applio/
+audio_output/
 tmp/
 reference_audio/
+models/
 *.json
 test.py
 
