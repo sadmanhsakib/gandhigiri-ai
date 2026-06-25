@@ -9,6 +9,7 @@ Pipeline position:
     tts.py (any voice) → voice_changer.py (Gandhi's voice) → playback
 """
 
+import platform
 import subprocess
 from pathlib import Path
 
@@ -17,8 +18,13 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 BASE_DIR      = Path(__file__).parent.parent.resolve()  # project root
 APPLIO_DIR    = BASE_DIR / "Applio"
-APPLIO_PYTHON = Path(f"{BASE_DIR}/.venv/Scripts/python.exe")
 APPLIO_INFER  = APPLIO_DIR / "core.py"
+APPLIO_PYTHON = (
+    BASE_DIR / ".venv" / "Scripts" / "python.exe"
+    if platform.system() == "Windows"
+    else BASE_DIR / ".venv" / "bin" / "python"
+)
+PREREQ_MARKER = APPLIO_DIR / "rvc" / "models" / "predictors" / "fcpe.pt"
 
 MODEL_PATH    = BASE_DIR / "models" / "voice_changer_200e_6000s.pth"
 INDEX_PATH    = BASE_DIR / "models" / "gandhi_model.index"
@@ -36,6 +42,19 @@ PITCH_METHOD         = "rmvpe" # best quality: rmvpe, fcpe, or hybrid[rmvpe+fcpe
 CLEAN_AUDIO          = "True"  # noise reduction on output — recommended for speech
 CLEAN_STRENGTH       = 0.5     # 0.0 - 1.0. Higher = stronger cleaning.
 VOLUME_ENVELOPE      = 0.25    # 0.0 - 1.0. Blends output volume envelope.
+
+
+def ensure_prerequisites():
+    """Download Applio model files on first run if not already present."""
+    if PREREQ_MARKER.exists():
+        return  # already downloaded, skip
+    print("[setup] First run detected — downloading Applio prerequisites...")
+    subprocess.run(
+        [str(APPLIO_PYTHON), "core.py", "prerequisites", "--models", "True"],
+        cwd=str(APPLIO_DIR),
+        check=True,
+    )
+    print("[setup] Prerequisites ready.")
 
 
 def _validate():
@@ -65,6 +84,7 @@ def _validate():
             f"Index file not found: {INDEX_PATH}\n"
             f"Download added_*.index from Google Drive into models/"
         )
+    ensure_prerequisites()
 
 
 def _run_inference(
