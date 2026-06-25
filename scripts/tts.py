@@ -13,8 +13,6 @@ Pipeline:
 import asyncio
 import os
 import edge_tts
-from indic_transliteration import sanscript
-from indic_transliteration.sanscript import transliterate
 
 # ---------------------------------------------------------------------------
 # Voice configuration
@@ -37,16 +35,6 @@ def main():
 
     output_path = text_to_speech(text=samples[1])
     print(f"✅ File exported successfully to {output_path}")
-
-def romanized_to_devanagari(text: str) -> str:
-    """
-    Converts romanized Hindi (e.g., "Tumhe sach ka raasta chunna hoga")
-    into Devanagari script so edge-tts's Hindi voice pronounces it correctly.
-
-    Uses ITRANS scheme as input since that's the closest match to how
-    people casually type romanized Hindi (phonetic spelling).
-    """
-    return transliterate(text, sanscript.ITRANS, sanscript.DEVANAGARI)
 
 
 async def _synthesize(text: str, voice: str, output_path: str):
